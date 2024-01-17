@@ -73,7 +73,7 @@ class HBNBCommand(cmd.Cmd):
                 pline = pline[2].strip()  # pline is now str
                 if pline:
                     # check for *args or **kwargs
-                    if pline[0] is '{' and pline[-1] is'}'\
+                    if pline[0] == '{' and pline[-1] == '}'\
                             and type(eval(pline)) is dict:
                         _args = pline
                     else:
@@ -113,15 +113,48 @@ class HBNBCommand(cmd.Cmd):
         """ Overrides the emptyline method of CMD """
         pass
 
-    def do_create(self, args):
+    def do_create(self, args, **kwargs):
         """ Create an object of any class"""
-        if not args:
+        splitted_class = args.split(' ')[0]
+        if not splitted_class:
             print("** class name missing **")
             return
-        elif args not in HBNBCommand.classes:
+        elif splitted_class not in HBNBCommand.classes:
             print("** class doesn't exist **")
             return
-        new_instance = HBNBCommand.classes[args]()
+        types_list = list(HBNBCommand.types)
+        other_pairs = args.split(' ')[1:]
+        kwargs = dict()
+        for pair in other_pairs:
+            if ('=' not in pair):
+                continue
+            key = pair.split("=")[0]
+            value = pair.split("=")[1]
+            kwargs[key] = value
+
+        if (kwargs is not None):
+            for key, value in kwargs.items():
+                if (key in types_list):
+                    value = HBNBCommand.types[key](value)
+                    kwargs[key] = value
+
+                else:
+                    if (value.isdecimal()):
+                        kwargs[key] = int(value)
+                    elif ('.' in value):
+                        unit = value.split(".")[0]
+                        decimal = value.split(".")[1]
+                        if (unit.isdecimal() and decimal.isdecimal()):
+                            kwargs[key] = float(value)
+                            continue
+                    else:
+                        if ('"' in value or '_' in value):
+                            value = value.replace('"', '')
+                            value = value.replace('_', ' ')
+                        kwargs[key] = value
+
+        new_instance = HBNBCommand.classes[splitted_class]()
+        new_instance.__dict__.update(kwargs)
         storage.save()
         print(new_instance.id)
         storage.save()
@@ -272,7 +305,7 @@ class HBNBCommand(cmd.Cmd):
                 args.append(v)
         else:  # isolate args
             args = args[2]
-            if args and args[0] is '\"':  # check for quoted arg
+            if args and args[0] == '\"':  # check for quoted arg
                 second_quote = args.find('\"', 1)
                 att_name = args[1:second_quote]
                 args = args[second_quote + 1:]
@@ -280,10 +313,10 @@ class HBNBCommand(cmd.Cmd):
             args = args.partition(' ')
 
             # if att_name was not quoted arg
-            if not att_name and args[0] is not ' ':
+            if not att_name and args[0] != ' ':
                 att_name = args[0]
             # check for quoted val arg
-            if args[2] and args[2][0] is '\"':
+            if args[2] and args[2][0] == '\"':
                 att_val = args[2][1:args[2].find('\"', 1)]
 
             # if att_val was not quoted arg
@@ -319,6 +352,7 @@ class HBNBCommand(cmd.Cmd):
         """ Help information for the update class """
         print("Updates an object with new information")
         print("Usage: update <className> <id> <attName> <attVal>\n")
+
 
 if __name__ == "__main__":
     HBNBCommand().cmdloop()

@@ -10,6 +10,7 @@ from models.state import State
 from models.city import City
 from models.amenity import Amenity
 from models.review import Review
+from os import getenv
 
 
 class HBNBCommand(cmd.Cmd):
@@ -115,49 +116,64 @@ class HBNBCommand(cmd.Cmd):
 
     def do_create(self, args, **kwargs):
         """ Create an object of any class"""
+        # getting the splitted class.
         splitted_class = args.split(' ')[0]
+        # printing that the class is missing if no argument is entered.
         if not splitted_class:
             print("** class name missing **")
             return
+        # printing that the class doesn't exist if it isn't in the dict.
         elif splitted_class not in HBNBCommand.classes:
             print("** class doesn't exist **")
             return
         types_list = list(HBNBCommand.types)
+        # other arguments that follow the class argument and include '='.
         other_pairs = args.split(' ')[1:]
-        kwargs = dict()
+        kwargs_dict = dict()
+        # saving other pairs in a dictionary.
         for pair in other_pairs:
             if ('=' not in pair):
                 continue
             key = pair.split("=")[0]
             value = pair.split("=")[1]
-            kwargs[key] = value
+            kwargs_dict[key] = value
 
-        if (kwargs is not None):
-            for key, value in kwargs.items():
+        # creating new instance with specific object.
+        new_instance = HBNBCommand.classes[splitted_class]()
+        # dealing with entry as a database storage.
+        # dealing with the entry as a file storage.
+
+        if (kwargs_dict is not None):
+            for key, value in kwargs_dict.items():
                 if (key in types_list):
                     value = HBNBCommand.types[key](value)
-                    kwargs[key] = value
+                    kwargs_dict[key] = value
 
                 else:
                     if (value.isdecimal()):
-                        kwargs[key] = int(value)
+                        kwargs_dict[key] = int(value)
                     elif ('.' in value):
                         unit = value.split(".")[0]
                         decimal = value.split(".")[1]
                         if (unit.isdecimal() and decimal.isdecimal()):
-                            kwargs[key] = float(value)
+                            kwargs_dict[key] = float(value)
                             continue
                     else:
                         if ('"' in value or '_' in value):
                             value = value.replace('"', '')
                             value = value.replace('_', ' ')
-                        kwargs[key] = value
+                        kwargs_dict[key] = value
 
-        new_instance = HBNBCommand.classes[splitted_class]()
-        new_instance.__dict__.update(kwargs)
-        storage.save()
-        print(new_instance.id)
-        storage.save()
+        if getenv('HBNB_TYPE_STORAGE') == 'db':
+            for key, value in kwargs_dict.items():
+                setattr(new_instance, key, value)
+            storage.new(new_instance)
+            storage.save()
+            print(new_instance.id)
+        else:
+            new_instance.__dict__.update(kwargs_dict)
+            storage.save()
+            print(new_instance.id)
 
     def help_create(self):
         """ Help information for the create method """
@@ -239,12 +255,20 @@ class HBNBCommand(cmd.Cmd):
             if args not in HBNBCommand.classes:
                 print("** class doesn't exist **")
                 return
-            for k, v in storage._FileStorage__objects.items():
-                if k.split('.')[0] == args:
-                    print_list.append(str(v))
+            if getenv('HBNB_TYPE_STORAGE') != 'db':
+                storage_objs = storage._FileSotrage__objects
+            else:
+                storage_objs = storage.all(args)
+                for k, v in storage_objs.items():
+                    if k.split('.')[0] == args:
+                        print_list.append(str(v))
         else:
-            for k, v in storage._FileStorage__objects.items():
-                print_list.append(str(v))
+            if getenv('HBNB_TYPE_STORAGE') != 'db':
+                storage_objs = storage._FileStorage__objects
+            else:
+                sotrage_objs = storage.all()
+                for k, v in storage_objs.items():
+                    print_list.append(str(v))
 
         print(print_list)
 

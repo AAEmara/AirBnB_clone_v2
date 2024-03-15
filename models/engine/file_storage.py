@@ -1,6 +1,13 @@
 #!/usr/bin/python3
 """This module defines a class to manage file storage for hbnb clone"""
 import json
+from models.base_model import BaseModel
+from models.user import User
+from models.place import Place
+from models.state import State
+from models.city import City
+from models.amenity import Amenity
+from models.review import Review
 
 
 class FileStorage:
@@ -25,22 +32,14 @@ class FileStorage:
 
     def save(self):
         """Saves storage dictionary to file"""
-        with open(FileStorage.__file_path, 'w') as f:
-            temp = {}
-            temp.update(FileStorage.__objects)
-            for key, val in temp.items():
-                temp[key] = val.to_dict()
-            json.dump(temp, f)
+        filename = FileStorage.__file_path
+        with open(filename, mode='w', encoding="utf-8") as w_file:
+            json.dump(
+                {k: v.to_dict() for k, v in FileStorage.__objects.items()},
+                w_file)
 
     def reload(self):
         """Loads storage dictionary from file"""
-        from models.base_model import BaseModel
-        from models.user import User
-        from models.place import Place
-        from models.state import State
-        from models.city import City
-        from models.amenity import Amenity
-        from models.review import Review
 
         classes = {
                     'BaseModel': BaseModel, 'User': User, 'Place': Place,
@@ -48,13 +47,15 @@ class FileStorage:
                     'Review': Review
                   }
         try:
-            temp = {}
-            with open(FileStorage.__file_path, 'r') as f:
-                temp = json.load(f)
-                for key, val in temp.items():
-                    self.all()[key] = classes[val['__class__']](**val)
+            filename = FileStorage.__file_path
+            with open(filename, mode='r', encoding="utf-8") as r_file:
+                py_obj = json.load(r_file)
         except FileNotFoundError:
             pass
+        else:
+            for key, val in py_obj.items():
+                cls_name = val["__class__"]
+                FileStorage.__objects[key] = eval(cls_name)(**val)
 
     def delete(self, obj=None):
         """Deletes an object if available."""

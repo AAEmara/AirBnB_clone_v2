@@ -145,7 +145,12 @@ class HBNBCommand(cmd.Cmd):
                     kwargs_dict[key] = value
 
                 else:
-                    if (value.isdecimal()):
+                   
+                    if ('"' in value or '_' in value):
+                        value = value.replace('"', '')
+                        value = value.replace('_', ' ')
+                        kwargs_dict[key] = value
+                    elif (value.isdecimal()):
                         kwargs_dict[key] = int(value)
                     elif ('.' in value):
                         unit = value.split(".")[0]
@@ -153,11 +158,6 @@ class HBNBCommand(cmd.Cmd):
                         if (unit.isdecimal() and decimal.isdecimal()):
                             kwargs_dict[key] = float(value)
                             continue
-                    else:
-                        if ('"' in value or '_' in value):
-                            value = value.replace('"', '')
-                            value = value.replace('_', ' ')
-                        kwargs_dict[key] = value
 
         # dealing with entry as a database storage.
         if getenv('HBNB_TYPE_STORAGE') == 'db':

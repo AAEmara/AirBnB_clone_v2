@@ -167,6 +167,7 @@ class HBNBCommand(cmd.Cmd):
         if getenv('HBNB_TYPE_STORAGE') == 'db':
             for key, value in kwargs_dict.items():
                 setattr(new_instance, key, value)
+            storage.reload()
             storage.new(new_instance)
             storage.save()
             print(new_instance.id)

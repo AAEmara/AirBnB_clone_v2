@@ -3,7 +3,6 @@
 import os
 from sqlalchemy import create_engine, MetaData
 from sqlalchemy.orm import sessionmaker, scoped_session
-from sqlalchemy import text
 
 
 class DBStorage:

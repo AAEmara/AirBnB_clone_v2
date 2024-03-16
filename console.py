@@ -145,7 +145,6 @@ class HBNBCommand(cmd.Cmd):
                     kwargs_dict[key] = value
 
                 else:
-                   
                     if ('"' in value or '_' in value):
                         value = value.replace('"', '')
                         value = value.replace('_', ' ')

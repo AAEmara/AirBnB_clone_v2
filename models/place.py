@@ -36,4 +36,5 @@ class Place(BaseModel, Base):
         amenity_ids = []
 
     def __init__(self, *args, **kwargs):
+        """ Initializing a Place Object."""
         super().__init__(*args, **kwargs)

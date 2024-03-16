@@ -22,6 +22,7 @@ class Place(BaseModel, Base):
         longitude = Column(Float, nullable=True)
         user = relationship('User', back_populates='places')
         cities = relationship('City', back_populates='places')
+        reviews = relationship('Review', back_populates='places')
     else:
         city_id = ""
         user_id = ""
@@ -38,3 +39,14 @@ class Place(BaseModel, Base):
     def __init__(self, *args, **kwargs):
         """ Initializing a Place Object."""
         super().__init__(*args, **kwargs)
+
+    if getenv('HBNB_TYPE_STORAGE') != 'db':
+        @property
+        def reviews(self):
+            """ Returns a list of Review instances for a certain place_id. """
+            place_objs = storage.all()
+            review_list = list()
+            for key, obj in place_objs.items():
+                if obj['place_id'] == self.id:
+                    review_list.append(obj)
+            return (review_list)

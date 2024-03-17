@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 """Module that includes a Fabric Script."""
-from fabric.api import local, put, run, env, sudo
+from fabric.api import local, put, run, env
+from os.path import exists
 
 
 env.hosts = ['52.90.14.162', '100.25.162.4']
@@ -17,6 +18,8 @@ def do_deploy(archive_path):
     Returns:
         False, if the file path `archive path` doesn't exist.
     """
+    if exists(archive_path) is False:
+        return (False)
     try:
         put(f"{archive_path}", "/tmp/")
         archive_file = archive_path.split('/')[1]

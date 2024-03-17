@@ -17,14 +17,18 @@ def do_deploy(archive_path):
     Returns:
         False, if the file path `archive path` doesn't exist.
     """
-    put(f"{archive_path}", "/tmp/")
-    archive_file = archive_path.split('/')[1]
-    archive_no_ext = archive_file.split('.')[0]
-    full_archive_dir = f"/data/web_static/releases/{archive_no_ext}"
-    run(f"mkdir -p {full_archive_dir}")
-    run(f"tar -xzf /tmp/{archive_file} -C {full_archive_dir}/")
-    run(f"rm /tmp/{archive_file}")
-    run(f"mv {full_archive_dir}/web_static/* {full_archive_dir}")
-    run(f"rm -r {full_archive_dir}/web_static")
-    run("unlink /data/web_static/current")
-    run(f"ln -sf {full_archive_dir}/ /data/web_static/current")
+    try:
+        put(f"{archive_path}", "/tmp/")
+        archive_file = archive_path.split('/')[1]
+        archive_no_ext = archive_file.split('.')[0]
+        full_archive_dir = f"/data/web_static/releases/{archive_no_ext}"
+        run(f"mkdir -p {full_archive_dir}")
+        run(f"tar -xzf /tmp/{archive_file} -C {full_archive_dir}/")
+        run(f"rm /tmp/{archive_file}")
+        run(f"mv {full_archive_dir}/web_static/* {full_archive_dir}")
+        run(f"rm -r {full_archive_dir}/web_static")
+        run("unlink /data/web_static/current")
+        run(f"ln -sf {full_archive_dir}/ /data/web_static/current")
+        return (True)
+    except:
+        return (False)

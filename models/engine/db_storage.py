@@ -47,6 +47,8 @@ class DBStorage:
                     obj_key = val.__name__ + '.' + instance.id
                     results_dict[obj_key] = instance
         else:
+            if type(cls) != str():
+                cls = cls.__name__
             instances = self.__session.query(class_dict[cls]).all()
             for key, val in class_dict.items():
                 if cls == key:

@@ -27,9 +27,9 @@ class State(BaseModel, Base):
         @property
         def cities(self):
             """Returns the list of City instances that matches state id."""
-            city_objs = storage.all(City)
+            city_objs = models.storage.all(City)
             matched_cities = list()
             for key, obj in city_objs.items():
-                if (obj["state_id"] == self.id):
+                if (obj.state_id == self.id):
                     matched_cities.append(obj)
             return (matched_cities)

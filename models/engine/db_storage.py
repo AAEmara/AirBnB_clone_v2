@@ -89,4 +89,6 @@ class DBStorage:
 
     def close(self):
         """Calls remove() method on the session available."""
-        self.__session__.remove()
+        session_factory = sessionmaker(bind=self.__engine)
+        Session = scoped_session(session_factory)
+        Session.remove()

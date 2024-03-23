@@ -6,8 +6,8 @@
     <BODY>
         <H1>{{ header_name }}</H1>
         <UL>
-        {% for state in states|dictsort('name', True) %}
-            <LI>{{ state.id }}:<B>{{ sate.name }}</B></LI>
+        {% for state_id, state_name in states|dictsort(true, 'value') %}
+            <LI>{{ state_id }}: <B>{{ state_name }}</B></LI>
         {% endfor %}
         </UL>
     </BODY>

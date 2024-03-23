@@ -47,7 +47,7 @@ class DBStorage:
                     obj_key = val.__name__ + '.' + instance.id
                     results_dict[obj_key] = instance
         else:
-            if type(cls) != str():
+            if type(cls) is not str:
                 cls = cls.__name__
             instances = self.__session.query(class_dict[cls]).all()
             for key, val in class_dict.items():
@@ -55,6 +55,7 @@ class DBStorage:
                     for instance in instances:
                         obj_key = val.__name__ + '.' + instance.id
                         results_dict[obj_key] = instance
+        print(results_dict)
         return (results_dict)
 
     def new(self, obj):

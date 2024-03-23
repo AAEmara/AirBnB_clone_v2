@@ -6,7 +6,7 @@
     <BODY>
         <H1>{{ header_name }}</H1>
         <UL>
-        {% for state_key, state_value in states_cities.items() %}
+        {% for state_key, state_value in states_cities|dictsort(True) %}
             <LI>{{ state_value.state_id }}: <B>{{ state_key }}</B>
                 <UL>
                     {% for city_list in state_value.cities %}{% if city_list.city_name %}

@@ -25,13 +25,24 @@ def state_list():
     """Displaying an HTML page inside the body tag."""
     class_name = "States"
     state_dict = dict()
-    state_objs = storage.all("State")
     if getenv("HBNB_TYPE_STORAGE") != "db":
+        state_objs = storage.all(State)
         for key, value in state_objs.items():
             curr_value = value.to_dict()
-            key_name = curr_value['id']
-            value_name = curr_value['name']
-            state_dict[key_name] = value_name
+            state_name = curr_value['name']
+            state_id = curr_value['id']
+            if state_name not in state_dict:
+                state_dict[state_name] = {'state_id': state_id,
+                                          'cities': list()}
+
+            cities_objs = value.cities
+            for obj in cities_objs:
+                city_dict = obj.to_dict()
+                city_id = city_dict['id']
+                city_name = city_dict['name']
+                city_append = {'city_name': city_name, 'city_id': city_id}
+                state_dict[state_name]['cities'].append(city_append)
+
     else:
         Session = storage._DBStorage__session
         stmnt = select(State.id, State.name, City.id, City.name)\

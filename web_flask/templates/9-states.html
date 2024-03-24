@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<HTML lang="en">
+    <HEAD>
+        <TITLE>HBNB</TITLE>
+    </HEAD>
+    <BODY>
+    {% if header_name %}
+        <H1>{{ header_name }}</H1>
+        {% if second_header %}<H3>{{ second_header }}</H3>{% endif %}
+        <UL>
+        {%- for state_key, value in states_cities|dictsort(True) %}
+            {% if not second_header %}
+            <LI>{{ value.state_id }}: <B>{{ state_key }}</B></LI>
+            {%- elif second_header %}
+            {%- for city_name, city_id in value.cities|dictsort(True) %}
+            <LI>{{ city_id }}: <B>{{ city_name }}</B></LI>
+            {% endfor -%}
+            {% else %}
+            <H1>Not found!</H1>
+            {% endif %}
+       {% endfor -%}
+        </UL>
+    {% else %}
+        <H1>Not found!</H1>
+    {% endif %}
+    </BODY>
+</HTML>
